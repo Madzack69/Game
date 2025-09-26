@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+<title>Attrape les Réductions — Jumia • Dynamic</title>
+<style>
+  /* ===== Palette Jumia (brand book) ===== */
+  :root{
+    /* Primaires marque */
+    --jumia-orange:#ff9900;   /* Orange Peel */
+    --jumia-yellow:#ffba00;   /* Selective Yellow */
+    /* Accents autorisés (support) */
+    --salmon:#ee704e;         /* Jumia Food */
+    --warm-orange:#ee7838;
+    --business-blue:#276076;  /* Official Store */
+    --jumia-red:#ec2326;      /* Flash/alert */
+    --grey:#7fa0b0;           /* Touch of Grey (Pay) */
+
+    --bg-deep:#0b1220;
+    --text:#f5f5f5;
+    --muted:#aab1bd;
+    --shadow:0 10px 28px rgba(0,0,0,.40);
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg-deep:#0a0a0a; --text:#f8fafc; }
+  }
+
+  *{box-sizing:border-box;touch-action:manipulation}
+  html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Inter,Roboto,Ubuntu,Arial,sans-serif;color:var(--text);
+    background:radial-gradient(1100px 520px at 50% -140px,#18212f 0%,var(--bg-deep) 60%,#070d18 100%);
+  }
+  .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:10px}
+  .card{width:min(96vw,880px);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
+        border:1px solid rgba(255,255,255,.08);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+  header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08)}
+  header h1{font-size:16px;margin:0;letter-spacing:.2px}
+  .btn{appearance:none;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:var(--text);
+       padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer}
+  .btn.orange{background:var(--jumia-orange);border-color:#e98600;color:#101010}
+  .btn:active{transform:translateY(1px)}
+
+  #game{position:relative;height:min(74vh,660px);min-height:460px;overflow:hidden;
+        background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.015))}
+  .fever-bg{background:linear-gradient(160deg, rgba(255,153,0,.18), rgba(255,186,0,.10));}
+
+  .hud{position:absolute;inset:8px 8px auto auto;display:flex;gap:6px;z-index:6;flex-wrap:wrap;justify-content:flex-end}
+  .pill{padding:7px 10px;border-radius:999px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.1);font-size:12px}
+  .meter{position:absolute;left:8px;right:8px;top:8px;height:8px;border-radius:999px;background:rgba(255,255,255,.09);overflow:hidden}
+  .meter>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--jumia-orange),var(--jumia-yellow))}
+
+  /* Streak/Combo meter toward FEVER */
+  .streak{position:absolute;left:8px;right:8px;top:24px;height:6px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden}
+  .streak>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--salmon),var(--jumia-orange));transition:width .15s linear}
+
+  .cart{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);width:94px;height:62px}
+  @media (min-width:680px){ .cart{width:104px;height:68px} }
+  .cart .body{position:absolute;inset:0;border-radius:12px;background:linear-gradient(180deg,#1a2842,#0f182d);border:1px solid rgba(255,255,255,.12);box-shadow:0 6px 16px rgba(0,0,0,.35)}
+  .cart .wheels{position:absolute;bottom:-8px;left:8px;right:8px;display:flex;justify-content:space-between}
+  .wheel{width:18px;height:18px;border-radius:50%;background:#0a0a0a;border:2px solid #333;box-shadow:inset 0 0 0 3px #222,inset 0 0 0 6px #111}
+  .catch-zone{position:absolute;left:6px;right:6px;top:-6px;height:16px}
+
+  /* ===== Coupons (icône %) variantes de la charte ===== */
+  .coupon{position:absolute;top:-60px;width:58px;height:58px;display:grid;place-items:center;border-radius:50%;
+          border:2px solid #e2860d; box-shadow:0 10px 20px rgba(0,0,0,.45); color:#111; will-change:transform}
+  .coupon svg{width:30px;height:30px;opacity:.98;filter:drop-shadow(0 1px 0 rgba(0,0,0,.25))}
+  .v-orange{background:radial-gradient(60% 60% at 30% 30%, var(--jumia-yellow), var(--jumia-orange));}
+  .v-warm{background:radial-gradient(60% 60% at 30% 30%, var(--warm-orange), var(--jumia-orange));}
+  .v-salmon{background:radial-gradient(60% 60% at 30% 30%, var(--salmon), var(--jumia-orange));}
+  .v-blue{background:radial-gradient(60% 60% at 30% 30%, var(--business-blue), var(--jumia-orange)); color:#fff; border-color:#1b435b}
+
+  /* FEVER glow */
+  .fever{box-shadow:0 0 0 3px rgba(255,186,0,.45), 0 12px 24px rgba(0,0,0,.45)}
+
+  .overlay{position:absolute;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:10;padding:12px}
+  .modal{width:min(92%,480px);background:#0c1426;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:16px;box-shadow:var(--shadow);}
+  .modal h2{margin:.2rem 0 .6rem;font-size:18px}
+  .modal p{margin:.2rem 0 .6rem;opacity:.92}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+  .field{flex:1 1 120px;display:flex;flex-direction:column;gap:6px}
+  .input{padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:var(--text)}
+  label{font-size:12px;color:var(--muted)}
+  table{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px}
+  th,td{padding:8px;border-bottom:1px solid rgba(255,255,255,.08);text-align:left}
+  .touch-hint{position:absolute;left:50%;transform:translateX(-50%);bottom:92px;font-size:13px;opacity:.85;background:rgba(0,0,0,.35);padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.1)}
+  footer{padding:10px 12px;border-top:1px solid rgba(255,255,255,.08);display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+  .hidden{display:none!important}
+
+  /* Dopamine toasts */
+  #toast{position:absolute;left:50%;top:18%;transform:translateX(-50%);z-index:7;pointer-events:none}
+  .toast{padding:8px 12px;border-radius:999px;background:var(--jumia-orange);color:#111;border:1px solid #e98600;font-weight:800;opacity:0;transform:translateY(-10px) scale(.96);transition:opacity .18s ease, transform .18s ease;box-shadow:0 8px 18px rgba(0,0,0,.35)}
+  .toast.show{opacity:1;transform:translateY(0) scale(1)}
+
+  /* “Our Angle” accent (subtle) */
+  .angle{position:absolute;inset:auto -20% 0 auto;width:160%;height:40%;transform:skewY(-11.5deg);background:linear-gradient(90deg, rgba(255,153,0,.12), rgba(255,186,0,.0));pointer-events:none}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <header>
+        <h1>🛒 Attrape les Réductions — Jumia</h1>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button id="btnStart" class="btn orange">Jouer</button>
+          <button id="btnReset" class="btn">Réinitialiser</button>
+        </div>
+      </header>
+
+      <div id="game" aria-label="Jeu attrape-réductions">
+        <div class="meter"><i id="progress"></i></div>
+        <div class="streak" title="Progression vers FEVER"><i id="streakBar"></i></div>
+        <div class="hud">
+          <div class="pill">Score : <b id="score">0</b></div>
+          <div class="pill">Ratés : <b id="missed">0</b>/3</div>
+          <div class="pill">Niv. <b id="level">1</b></div>
+          <div class="pill">Temps : <b id="time">30</b>s</div>
+          <div class="pill" id="comboPill" style="display:none">Combo x<b id="combo">1</b></div>
+          <div class="pill hidden" id="feverPill">🔥 Fever</div>
+        </div>
+
+        <div class="angle"></div>
+        <div id="toast"></div>
+
+        <div class="cart" id="cart">
+          <div class="body"></div>
+          <div class="catch-zone" id="catchZone"></div>
+          <div class="wheels"><div class="wheel"></div><div class="wheel"></div></div>
+        </div>
+
+        <div class="touch-hint" id="hint">Glisse pour bouger • Appuie pour jouer</div>
+
+        <div class="overlay" id="overlay">
+          <div class="modal">
+            <h2 id="overTitle">Fin de la partie</h2>
+            <p id="overDesc"></p>
+
+            <form id="winnerForm" class="hidden">
+              <p>Entre tes coordonnées pour le <b>classement</b> (les gagnants seront contactés).</p>
+              <div class="row">
+                <div class="field"><label for="name">Nom</label><input id="name" class="input" required placeholder="Votre nom"></div>
+                <div class="field"><label for="email">Email</label><input id="email" type="email" class="input" required placeholder="exemple@email.com"></div>
+                <div class="field"><label for="phone">Téléphone</label><input id="phone" class="input" required placeholder="+212..." inputmode="tel" pattern="^[+0-9\\s-]{6,}$"></div>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:10px">
+                <button class="btn orange" type="submit">Valider</button>
+                <button class="btn" type="button" id="skipSubmit">Plus tard</button>
+              </div>
+            </form>
+
+            <div id="leaderboardBlock" class="hidden">
+              <h3 style="margin:.6rem 0 .2rem;font-size:16px">Classement (Local)</h3>
+              <table id="board">
+                <thead><tr><th>#</th><th>Nom</th><th>Score</th><th>Niveau</th><th>Date</th></tr></thead>
+                <tbody></tbody>
+              </table>
+              <div style="display:flex;gap:8px;justify-content:center;margin-top:8px">
+                <button class="btn orange" id="btnPlayAgain">Rejouer</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <small style="opacity:.85">Mobile first • 30s • 3 ratés = fin • Combo → FEVER (bonus)</small>
+        <small style="opacity:.75">Palette Jumia + variantes support • Aucune ressource externe</small>
+      </footer>
+    </div>
+  </div>
+
+<script>
+(()=>{
+  const q = (s)=>document.querySelector(s);
+  const game = q('#game'), cart = q('#cart'), catchZone = q('#catchZone');
+  const scoreEl = q('#score'), missedEl = q('#missed'), levelEl = q('#level'), timeEl = q('#time');
+  const comboPill = q('#comboPill'), comboEl = q('#combo');
+  const feverPill = q('#feverPill'), streakBar = q('#streakBar');
+  const progressEl = q('#progress'), overlay = q('#overlay'), overTitle = q('#overTitle'), overDesc = q('#overDesc');
+  const hint = q('#hint'), winnerForm = q('#winnerForm'), boardTbody = q('#board tbody'), leaderboardBlock = q('#leaderboardBlock');
+  const btnStart = q('#btnStart'), btnReset = q('#btnReset'), btnPlayAgain = q('#btnPlayAgain'), skipSubmit = q('#skipSubmit');
+  const toastRoot = q('#toast');
+
+  const MAX_COUPONS = 12;
+  const ICON_PERCENT = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7.5 8.5A2.5 2.5 0 1 1 12.5 8.5 2.5 2.5 0 0 1 7.5 8.5zm4 7a2.5 2.5 0 1 0 2.5-2.5A2.5 2.5 0 0 0 11.5 15.5zM6 18l12-12"/></svg>';
+
+  const state = {
+    playing:false, score:0, missed:0, level:1, timeLeft:30,
+    speedBase:170, spawnEvery:800, lastSpawn:0, lastTick:0,
+    coupons:[], pool:[], combo:0, lastCatchAt:0,
+    fever:0 // seconds remaining
+  };
+
+  function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
+
+  // Pool coupons
+  function makeCoupon(){
+    const el = document.createElement('div');
+    el.className = 'coupon v-orange'; el.innerHTML = ICON_PERCENT;
+    el.style.transform='translateY(0px)';
+    el._active = false; return el;
+  }
+  for(let i=0;i<MAX_COUPONS;i++){ const n=makeCoupon(); game.appendChild(n); n.style.display='none'; state.pool.push(n); }
+
+  const variants = ['v-orange','v-warm','v-salmon','v-orange','v-orange','v-blue']; // bias towards brand orange
+  function spawnCoupon(){
+    const el = state.pool.find(p=>!p._active);
+    if(!el) return;
+    const gw = game.clientWidth;
+    const x = Math.random()*(gw-70)+8;
+    el.style.left = x + 'px';
+    el.style.top = '-60px';
+    el.style.display = 'grid';
+    el._x = x; el._y = -60; el._active = true;
+    el._speed = (state.speedBase + Math.random()*60 + state.level*18) * (state.fever?1.25:1);
+    // variant
+    el.className = 'coupon ' + variants[(Math.random()*variants.length)|0] + (state.fever ? ' fever':'');
+    state.coupons.push(el);
+  }
+  function deactivate(el){ el._active=false; el.style.display='none'; }
+
+  // Controls (touch-first)
+  let pointerActive=false;
+  function setCartX(clientX){
+    const rect = game.getBoundingClientRect();
+    const x = clamp(clientX - rect.left, 0, rect.width);
+    cart.style.left = (x/rect.width*100) + '%';
+  }
+  game.addEventListener('pointerdown', (e)=>{
+    pointerActive=true; setCartX(e.clientX); game.setPointerCapture(e.pointerId);
+    if(!state.playing) start();
+  }, {passive:true});
+  game.addEventListener('pointermove', (e)=>{ if(pointerActive) setCartX(e.clientX); }, {passive:true});
+  game.addEventListener('pointerup', ()=>{ pointerActive=false; }, {passive:true});
+
+  // Toasts
+  let toastTimer = null;
+  function showToast(txt){
+    let t = toastRoot.firstElementChild;
+    if(!t){ t = document.createElement('div'); t.className='toast'; toastRoot.appendChild(t); }
+    t.textContent = txt;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=> t.classList.remove('show'), 640);
+  }
+
+  function reset(){
+    state.playing=false;
+    state.score=0; state.missed=0; state.level=1; state.timeLeft=30; state.combo=0; state.fever=0;
+    state.speedBase=170; state.spawnEvery=800; state.lastSpawn=0;
+    scoreEl.textContent='0'; missedEl.textContent='0'; levelEl.textContent='1'; timeEl.textContent='30';
+    progressEl.style.width='0%'; overlay.style.display='none'; hint.classList.remove('hidden');
+    comboPill.style.display='none'; comboEl.textContent='1'; feverPill.classList.add('hidden'); streakBar.style.width='0%';
+    game.classList.remove('fever-bg');
+    state.coupons.forEach(deactivate); state.coupons.length=0;
+  }
+
+  function start(){
+    reset(); state.playing=true; state.lastTick=performance.now(); requestAnimationFrame(tick);
+  }
+
+  function updateLevel(){
+    const newLevel = 1 + Math.floor(state.score/10);
+    if(newLevel !== state.level){
+      state.level = newLevel; levelEl.textContent=String(newLevel);
+      state.speedBase += 16; state.spawnEvery = Math.max(320, state.spawnEvery - 45);
+      showToast('🚀 Niveau ' + newLevel);
+    }
+  }
+
+  function triggerFever(){
+    state.fever = 8; // seconds
+    game.classList.add('fever-bg');
+    feverPill.classList.remove('hidden');
+    showToast('🔥 FEVER ON!');
+    if(navigator.vibrate) navigator.vibrate([20,50,20]);
+  }
+  function endFever(){
+    state.fever = 0;
+    game.classList.remove('fever-bg');
+    feverPill.classList.add('hidden');
+  }
+
+  function onCatch(){
+    const now = performance.now();
+    if(now - state.lastCatchAt < 850){ state.combo = Math.min(10, state.combo + 1); }
+    else { state.combo = 1; }
+    state.lastCatchAt = now;
+    comboPill.style.display = state.combo>1 ? '' : 'none';
+    comboEl.textContent = String(state.combo);
+    const mult = state.fever ? 2 : 1;
+    state.score += mult * state.combo; scoreEl.textContent = String(state.score);
+    showToast(state.fever ? ('⚡ +' + (mult*state.combo)) : (state.combo>1 ? ('🔥 Combo x' + state.combo) : 'Super !'));
+    if(navigator.vibrate) navigator.vibrate(16);
+
+    // progress to fever
+    const needed = 6;
+    const p = Math.min(100, (state.combo/needed)*100);
+    streakBar.style.width = p + '%';
+    if(state.combo>=needed && !state.fever) triggerFever();
+  }
+
+  function gameOver(win=false){
+    state.playing=false;
+    overlay.style.display='flex';
+    overTitle.textContent = win ? '🎉 Bravo !' : 'Fin de la partie';
+    overDesc.textContent = `Score ${state.score} • Niveau ${state.level}`;
+    winnerForm.classList.remove('hidden'); leaderboardBlock.classList.add('hidden');
+    endFever();
+    window.dispatchEvent(new CustomEvent('deal-game:finished', {
+      detail: {score:state.score, level:state.level, missed:state.missed, ts:Date.now()}
+    }));
+  }
+
+  function tick(now){
+    if(!state.playing) return;
+    const dt = (now - state.lastTick)/1000; state.lastTick = now;
+
+    // Fever countdown
+    if(state.fever>0){
+      state.fever -= dt;
+      if(state.fever<=0) endFever();
+    }
+
+    // spawn
+    if(!state.lastSpawn || now - state.lastSpawn > (state.fever? state.spawnEvery*0.7 : state.spawnEvery)){
+      if(state.coupons.length < MAX_COUPONS) spawnCoupon();
+      state.lastSpawn = now;
+    }
+
+    const rectCatch = catchZone.getBoundingClientRect();
+    const rectGame = game.getBoundingClientRect();
+    // during FEVER, agrandir la zone de catch légèrement
+    if(state.fever){ catchZone.style.height = '24px'; } else { catchZone.style.height = '16px'; }
+
+    // move + collisions
+    for(let i=state.coupons.length-1;i>=0;i--){
+      const el = state.coupons[i];
+      el._y += el._speed * dt;
+      el.style.transform = `translateY(${el._y}px)`;
+      const r = el.getBoundingClientRect();
+
+      if(!(r.bottom < rectCatch.top || r.top > rectCatch.bottom || r.right < rectCatch.left || r.left > rectCatch.right)){
+        onCatch(); deactivate(el); state.coupons.splice(i,1); updateLevel(); continue;
+      }
+
+      if(r.top > rectGame.bottom){
+        state.missed += 1; missedEl.textContent = String(state.missed);
+        deactivate(el); state.coupons.splice(i,1);
+        comboPill.style.display='none'; state.combo = 0; streakBar.style.width='0%';
+        if(navigator.vibrate) navigator.vibrate([10,40]);
+        if(state.missed >= 3){ gameOver(false); return; }
+      }
+    }
+
+    // timer
+    state.timeLeft -= dt; const total = 30;
+    timeEl.textContent = String(Math.max(0, Math.ceil(state.timeLeft)));
+    progressEl.style.width = (100*(1 - (total - state.timeLeft)/total)) + '%';
+    if(state.timeLeft <= 0){ gameOver(true); return; }
+
+    hint.classList.add('hidden');
+    requestAnimationFrame(tick);
+  }
+
+  // Leaderboard local
+  const LS_KEY = 'deal-game.leaderboard.v3';
+  function getLeaderboard(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)) || []; }catch(e){ return []; } }
+  function setLeaderboard(list){ localStorage.setItem(LS_KEY, JSON.stringify(list.slice(0,100))); }
+  function addToLeaderboard(entry){
+    const list = getLeaderboard();
+    list.push(entry);
+    list.sort((a,b)=> b.score - a.score || a.ts - b.ts);
+    setLeaderboard(list);
+  }
+  function renderLeaderboard(){
+    const list = getLeaderboard();
+    boardTbody.innerHTML = '';
+    list.slice(0,25).forEach((row,i)=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${i+1}</td><td>${escapeHTML(row.name)}</td><td>${row.score}</td><td>${row.level}</td><td>${new Date(row.ts).toLocaleDateString()}</td>`;
+      boardTbody.appendChild(tr);
+    });
+  }
+  function escapeHTML(s){ return String(s).replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+
+  winnerForm.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const name = q('#name').value.trim();
+    const email = q('#email').value.trim();
+    const phone = q('#phone').value.trim();
+    if(!name || !email || !phone) return;
+    const entry = { name, email, phone, score:state.score, level:state.level, ts:Date.now() };
+    addToLeaderboard(entry); renderLeaderboard();
+    winnerForm.classList.add('hidden'); leaderboardBlock.classList.remove('hidden');
+    window.dispatchEvent(new CustomEvent('deal-game:submit', { detail: entry }));
+    // fetch('VOTRE_APPS_SCRIPT_URL', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(entry)});
+  });
+
+  skipSubmit.addEventListener('click', ()=>{
+    renderLeaderboard(); winnerForm.classList.add('hidden'); leaderboardBlock.classList.remove('hidden');
+  });
+
+  btnStart.addEventListener('click', ()=>{ if(!state.playing) start(); });
+  btnReset.addEventListener('click', reset);
+  btnPlayAgain.addEventListener('click', ()=> start());
+
+  window.DealsGame = {
+    start, reset,
+    onFinish(h){ window.addEventListener('deal-game:finished', e=>h(e.detail)); },
+    onSubmit(h){ window.addEventListener('deal-game:submit', e=>h(e.detail)); },
+    getLeaderboard
+  };
+})();
+</script>
+</body>
+</html>
