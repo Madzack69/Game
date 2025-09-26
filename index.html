@@ -3,381 +3,370 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-<title>Attrape les Réductions — Jumia • Dynamic</title>
+<title>Memory Jumia — 2 min, Ultra Simple</title>
 <style>
-  /* ===== Palette Jumia (brand book) ===== */
   :root{
-    /* Primaires marque */
-    --jumia-orange:#ff9900;   /* Orange Peel */
-    --jumia-yellow:#ffba00;   /* Selective Yellow */
-    /* Accents autorisés (support) */
-    --salmon:#ee704e;         /* Jumia Food */
-    --warm-orange:#ee7838;
-    --business-blue:#276076;  /* Official Store */
-    --jumia-red:#ec2326;      /* Flash/alert */
-    --grey:#7fa0b0;           /* Touch of Grey (Pay) */
-
-    --bg-deep:#0b1220;
-    --text:#f5f5f5;
-    --muted:#aab1bd;
+    --jumia:#ff9900;        /* Orange Peel */
+    --jumia-2:#ffba00;      /* Selective Yellow */
+    --accent:#276076;       /* Business Blue */
+    --bg:#0b1220;
+    --text:#f6f7fb;
+    --muted:#b6bfca;
+    --card:#0f1627;
     --shadow:0 10px 28px rgba(0,0,0,.40);
   }
-  @media (prefers-color-scheme: light){
-    :root{ --bg-deep:#0a0a0a; --text:#f8fafc; }
-  }
-
   *{box-sizing:border-box;touch-action:manipulation}
-  html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Inter,Roboto,Ubuntu,Arial,sans-serif;color:var(--text);
-    background:radial-gradient(1100px 520px at 50% -140px,#18212f 0%,var(--bg-deep) 60%,#070d18 100%);
+  html,body{
+    height:100%;margin:0;
+    font-family:system-ui,-apple-system,Segoe UI,Inter,Roboto,Ubuntu,Arial,sans-serif;
+    color:var(--text);
+    background:radial-gradient(1100px 520px at 50% -140px,#18212f 0%,var(--bg) 60%,#070d18 100%);
   }
   .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:10px}
-  .card{width:min(96vw,880px);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
-        border:1px solid rgba(255,255,255,.08);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
-  header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08)}
-  header h1{font-size:16px;margin:0;letter-spacing:.2px}
+  .card{
+    width:min(96vw,980px);
+    background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03));
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:16px;box-shadow:var(--shadow);overflow:hidden
+  }
+  header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.10)}
+  header h1{font-size:19px;margin:0;letter-spacing:.2px}
   .btn{appearance:none;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:var(--text);
-       padding:10px 14px;border-radius:12px;font-weight:700;cursor:pointer}
-  .btn.orange{background:var(--jumia-orange);border-color:#e98600;color:#101010}
+       padding:12px 16px;border-radius:14px;font-weight:900;cursor:pointer;font-size:16px}
+  .btn.orange{background:var(--jumia);border-color:#e98600;color:#101010}
   .btn:active{transform:translateY(1px)}
+  .controls{display:flex;gap:8px;align-items:center}
+  .pill{padding:8px 12px;border-radius:999px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.12);font-size:14px}
+  .hud{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .hud strong{font-size:16px}
+  main{padding:12px}
 
-  #game{position:relative;height:min(74vh,660px);min-height:460px;overflow:hidden;
-        background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.015))}
-  .fever-bg{background:linear-gradient(160deg, rgba(255,153,0,.18), rgba(255,186,0,.10));}
+  /* Global timer */
+  .global-timer{display:flex;gap:8px;align-items:center}
+  .timerbar{position:relative;height:8px;border-radius:999px;background:rgba(255,255,255,.14);overflow:hidden;width:180px}
+  .timerbar>i{display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--jumia),var(--jumia-2));transform-origin:left center}
 
-  .hud{position:absolute;inset:8px 8px auto auto;display:flex;gap:6px;z-index:6;flex-wrap:wrap;justify-content:flex-end}
-  .pill{padding:7px 10px;border-radius:999px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.1);font-size:12px}
-  .meter{position:absolute;left:8px;right:8px;top:8px;height:8px;border-radius:999px;background:rgba(255,255,255,.09);overflow:hidden}
-  .meter>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--jumia-orange),var(--jumia-yellow))}
+  /* Grid responsive — tiny, fast */
+  .grid{display:grid;gap:12px;justify-content:center}
+  .grid.cols-2{grid-template-columns:repeat(2, minmax(86px, 1fr));}
+  .grid.cols-3{grid-template-columns:repeat(3, minmax(86px, 1fr));}
+  .grid.cols-4{grid-template-columns:repeat(4, minmax(86px, 1fr));}
+  @media (min-width:520px){ .grid .cell{width:118px;height:146px} }
+  @media (max-width:519px){ .grid .cell{width:100px;height:128px} }
 
-  /* Streak/Combo meter toward FEVER */
-  .streak{position:absolute;left:8px;right:8px;top:24px;height:6px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden}
-  .streak>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--salmon),var(--jumia-orange));transition:width .15s linear}
+  /* Card flip */
+  .cell{position:relative;perspective:900px}
+  .tile{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .22s ease;cursor:pointer;border:none;background:transparent}
+  .tile.flipped{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;border-radius:16px;border:1px solid rgba(255,255,255,.12);backface-visibility:hidden;display:grid;place-items:center}
+  .front{background:linear-gradient(180deg, #1b2741, #0f1627)}
+  .front .logo{width:48px;height:48px;border-radius:50%;background:radial-gradient(60% 60% at 30% 30%, var(--jumia-2), var(--jumia));border:2px solid #e98600;display:grid;place-items:center;box-shadow:0 8px 16px rgba(0,0,0,.45)}
+  .front svg{width:28px;height:28px;color:#111;filter:drop-shadow(0 1px 0 rgba(0,0,0,.25))}
+  .back{background:linear-gradient(180deg, #ffe29e, #ffd074);transform:rotateY(180deg);color:#111;font-weight:900;font-size:30px;letter-spacing:.6px;display:grid;place-items:center}
+  .match{outline:2px solid var(--jumia); box-shadow:0 0 0 3px rgba(255,153,0,.35) inset}
 
-  .cart{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);width:94px;height:62px}
-  @media (min-width:680px){ .cart{width:104px;height:68px} }
-  .cart .body{position:absolute;inset:0;border-radius:12px;background:linear-gradient(180deg,#1a2842,#0f182d);border:1px solid rgba(255,255,255,.12);box-shadow:0 6px 16px rgba(0,0,0,.35)}
-  .cart .wheels{position:absolute;bottom:-8px;left:8px;right:8px;display:flex;justify-content:space-between}
-  .wheel{width:18px;height:18px;border-radius:50%;background:#0a0a0a;border:2px solid #333;box-shadow:inset 0 0 0 3px #222,inset 0 0 0 6px #111}
-  .catch-zone{position:absolute;left:6px;right:6px;top:-6px;height:16px}
+  /* Voucher chip */
+  .coupon{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(90deg,rgba(255,153,0,.18),rgba(255,186,0,.1));border:1px dashed #e98600;border-radius:14px;padding:12px 14px;margin:8px 0}
+  .badge{font-weight:900;color:#101010;background:var(--jumia);border:1px solid #e98600;border-radius:999px;padding:6px 10px;font-size:13px}
+  .code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-weight:900;font-size:18px;color:#fff;letter-spacing:1.1px}
+  .tap{font-size:12px;opacity:.85}
 
-  /* ===== Coupons (icône %) variantes de la charte ===== */
-  .coupon{position:absolute;top:-60px;width:58px;height:58px;display:grid;place-items:center;border-radius:50%;
-          border:2px solid #e2860d; box-shadow:0 10px 20px rgba(0,0,0,.45); color:#111; will-change:transform}
-  .coupon svg{width:30px;height:30px;opacity:.98;filter:drop-shadow(0 1px 0 rgba(0,0,0,.25))}
-  .v-orange{background:radial-gradient(60% 60% at 30% 30%, var(--jumia-yellow), var(--jumia-orange));}
-  .v-warm{background:radial-gradient(60% 60% at 30% 30%, var(--warm-orange), var(--jumia-orange));}
-  .v-salmon{background:radial-gradient(60% 60% at 30% 30%, var(--salmon), var(--jumia-orange));}
-  .v-blue{background:radial-gradient(60% 60% at 30% 30%, var(--business-blue), var(--jumia-orange)); color:#fff; border-color:#1b435b}
+  footer{padding:12px;border-top:1px solid rgba(255,255,255,.10);display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap}
 
-  /* FEVER glow */
-  .fever{box-shadow:0 0 0 3px rgba(255,186,0,.45), 0 12px 24px rgba(0,0,0,.45)}
-
-  .overlay{position:absolute;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:10;padding:12px}
-  .modal{width:min(92%,480px);background:#0c1426;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:16px;box-shadow:var(--shadow);}
-  .modal h2{margin:.2rem 0 .6rem;font-size:18px}
+  /* Overlays */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:20;padding:12px}
+  .modal{width:min(92%,560px);background:#0c1426;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:16px;box-shadow:var(--shadow);text-align:center}
+  .modal h2{margin:.2rem 0 .6rem;font-size:20px}
   .modal p{margin:.2rem 0 .6rem;opacity:.92}
   .row{display:flex;gap:8px;flex-wrap:wrap}
   .field{flex:1 1 120px;display:flex;flex-direction:column;gap:6px}
-  .input{padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:var(--text)}
-  label{font-size:12px;color:var(--muted)}
+  .input{padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:var(--text);font-size:15px}
+
   table{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px}
   th,td{padding:8px;border-bottom:1px solid rgba(255,255,255,.08);text-align:left}
-  .touch-hint{position:absolute;left:50%;transform:translateX(-50%);bottom:92px;font-size:13px;opacity:.85;background:rgba(0,0,0,.35);padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.1)}
-  footer{padding:10px 12px;border-top:1px solid rgba(255,255,255,.08);display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap}
-  .hidden{display:none!important}
 
-  /* Dopamine toasts */
-  #toast{position:absolute;left:50%;top:18%;transform:translateX(-50%);z-index:7;pointer-events:none}
-  .toast{padding:8px 12px;border-radius:999px;background:var(--jumia-orange);color:#111;border:1px solid #e98600;font-weight:800;opacity:0;transform:translateY(-10px) scale(.96);transition:opacity .18s ease, transform .18s ease;box-shadow:0 8px 18px rgba(0,0,0,.35)}
+  /* Toasts */
+  #toast{position:fixed;left:50%;top:16%;transform:translateX(-50%);z-index:30;pointer-events:none}
+  .toast{padding:10px 14px;border-radius:999px;background:var(--jumia);color:#111;border:1px solid #e98600;font-weight:900;opacity:0;transform:translateY(-10px) scale(.96);transition:opacity .18s ease, transform .18s ease;box-shadow:0 8px 18px rgba(0,0,0,.35);font-size:15px}
   .toast.show{opacity:1;transform:translateY(0) scale(1)}
 
-  /* “Our Angle” accent (subtle) */
-  .angle{position:absolute;inset:auto -20% 0 auto;width:160%;height:40%;transform:skewY(-11.5deg);background:linear-gradient(90deg, rgba(255,153,0,.12), rgba(255,186,0,.0));pointer-events:none}
+  /* Final vouchers list */
+  .voucher-list{display:flex;flex-direction:column;gap:10px;margin:8px 0}
+  .actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}
 </style>
 </head>
 <body>
   <div class="wrap">
     <div class="card">
       <header>
-        <h1>🛒 Attrape les Réductions — Jumia</h1>
-        <div style="display:flex;gap:8px;align-items:center">
+        <div class="hud">
+          <h1>🧠 Memory Jumia</h1>
+          <div class="pill">Niveau : <strong id="level">1</strong>/5</div>
+          <div class="pill">Coups : <strong id="moves">0</strong></div>
+          <div class="pill global-timer">
+            ⏱️ <strong id="globalTime">02:00</strong>
+            <span class="timerbar" aria-hidden="true"><i id="timerFill"></i></span>
+          </div>
+        </div>
+        <div class="controls">
           <button id="btnStart" class="btn orange">Jouer</button>
           <button id="btnReset" class="btn">Réinitialiser</button>
+          <button id="btnFast" class="btn">Finir maintenant</button>
         </div>
       </header>
 
-      <div id="game" aria-label="Jeu attrape-réductions">
-        <div class="meter"><i id="progress"></i></div>
-        <div class="streak" title="Progression vers FEVER"><i id="streakBar"></i></div>
-        <div class="hud">
-          <div class="pill">Score : <b id="score">0</b></div>
-          <div class="pill">Ratés : <b id="missed">0</b>/3</div>
-          <div class="pill">Niv. <b id="level">1</b></div>
-          <div class="pill">Temps : <b id="time">30</b>s</div>
-          <div class="pill" id="comboPill" style="display:none">Combo x<b id="combo">1</b></div>
-          <div class="pill hidden" id="feverPill">🔥 Fever</div>
-        </div>
-
-        <div class="angle"></div>
+      <main>
+        <div id="grid" class="grid cols-2" aria-label="Plateau du jeu"></div>
         <div id="toast"></div>
-
-        <div class="cart" id="cart">
-          <div class="body"></div>
-          <div class="catch-zone" id="catchZone"></div>
-          <div class="wheels"><div class="wheel"></div><div class="wheel"></div></div>
-        </div>
-
-        <div class="touch-hint" id="hint">Glisse pour bouger • Appuie pour jouer</div>
-
-        <div class="overlay" id="overlay">
-          <div class="modal">
-            <h2 id="overTitle">Fin de la partie</h2>
-            <p id="overDesc"></p>
-
-            <form id="winnerForm" class="hidden">
-              <p>Entre tes coordonnées pour le <b>classement</b> (les gagnants seront contactés).</p>
-              <div class="row">
-                <div class="field"><label for="name">Nom</label><input id="name" class="input" required placeholder="Votre nom"></div>
-                <div class="field"><label for="email">Email</label><input id="email" type="email" class="input" required placeholder="exemple@email.com"></div>
-                <div class="field"><label for="phone">Téléphone</label><input id="phone" class="input" required placeholder="+212..." inputmode="tel" pattern="^[+0-9\\s-]{6,}$"></div>
-              </div>
-              <div style="display:flex;gap:8px;margin-top:10px">
-                <button class="btn orange" type="submit">Valider</button>
-                <button class="btn" type="button" id="skipSubmit">Plus tard</button>
-              </div>
-            </form>
-
-            <div id="leaderboardBlock" class="hidden">
-              <h3 style="margin:.6rem 0 .2rem;font-size:16px">Classement (Local)</h3>
-              <table id="board">
-                <thead><tr><th>#</th><th>Nom</th><th>Score</th><th>Niveau</th><th>Date</th></tr></thead>
-                <tbody></tbody>
-              </table>
-              <div style="display:flex;gap:8px;justify-content:center;margin-top:8px">
-                <button class="btn orange" id="btnPlayAgain">Rejouer</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      </main>
 
       <footer>
-        <small style="opacity:.85">Mobile first • 30s • 3 ratés = fin • Combo → FEVER (bonus)</small>
-        <small style="opacity:.75">Palette Jumia + variantes support • Aucune ressource externe</small>
+        <small style="opacity:.88">Objectif : te donner tes <b>bons</b> en moins de <b>2 minutes</b>. Simple & rapide.</small>
+        <a href="https://www.jumia.ma/" class="btn orange" style="text-decoration:none">🛒 Commander maintenant</a>
       </footer>
+    </div>
+  </div>
+
+  <!-- Overlay: level complete + voucher -->
+  <div id="overlayWin" class="overlay">
+    <div class="modal">
+      <h2 id="winTitle">🎉 Bravo !</h2>
+      <p id="winDesc"></p>
+      <div id="levelVoucher" class="coupon" role="button" aria-label="Copier le bon">
+        <span class="badge" id="vBadge">Niv. 1</span>
+        <span class="code" id="vCode">JUM-L1-XXXX</span>
+        <span class="tap">• Appuie pour copier</span>
+      </div>
+      <div class="actions">
+        <button id="btnNext" class="btn orange">Niveau suivant</button>
+        <button id="btnFinishNow" class="btn">Finir maintenant</button>
+      </div>
+      <small style="opacity:.75;display:block;margin-top:6px">Tous les bons seront aussi listés à la fin.</small>
+    </div>
+  </div>
+
+  <!-- Overlay: final delivery + winners -->
+  <div id="overlaySubmit" class="overlay">
+    <div class="modal">
+      <h2>🏁 Fin du jeu — Tes bons</h2>
+      <p>Merci d’avoir joué ! Voici tes bons gagnés (tape pour copier) :</p>
+      <div id="allVouchers" class="voucher-list"></div>
+      <div class="actions">
+        <button id="copyAll" class="btn orange">Tout copier</button>
+        <a href="https://www.jumia.ma/" class="btn orange" style="text-decoration:none">Utiliser mes bons</a>
+        <button id="btnCloseVouchers" class="btn">Fermer</button>
+      </div>
+      <hr style="border:none;border-top:1px solid rgba(255,255,255,.12);margin:12px 0" />
+      <h3 style="margin:0 0 6px">🏆 Classement local</h3>
+      <form id="winnerForm">
+        <p>Participe au tirage : entre tes coordonnées.</p>
+        <div class="row">
+          <div class="field"><label for="name">Nom</label><input id="name" class="input" required placeholder="Votre nom"></div>
+          <div class="field"><label for="email">Email</label><input id="email" type="email" class="input" required placeholder="exemple@email.com"></div>
+          <div class="field"><label for="phone">Téléphone</label><input id="phone" class="input" required placeholder="+212..." inputmode="tel" pattern="^[+0-9\\s-]{6,}$"></div>
+        </div>
+        <div class="actions">
+          <button class="btn orange" type="submit">Valider</button>
+          <button class="btn" type="button" id="skipSubmit">Plus tard</button>
+        </div>
+      </form>
+      <table id="board">
+        <thead><tr><th>#</th><th>Nom</th><th>Niveau</th><th>Coups</th><th>Temps</th><th>Date</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div class="actions">
+        <button id="closeSubmit" class="btn">Fermer</button>
+      </div>
     </div>
   </div>
 
 <script>
 (()=>{
   const q = (s)=>document.querySelector(s);
-  const game = q('#game'), cart = q('#cart'), catchZone = q('#catchZone');
-  const scoreEl = q('#score'), missedEl = q('#missed'), levelEl = q('#level'), timeEl = q('#time');
-  const comboPill = q('#comboPill'), comboEl = q('#combo');
-  const feverPill = q('#feverPill'), streakBar = q('#streakBar');
-  const progressEl = q('#progress'), overlay = q('#overlay'), overTitle = q('#overTitle'), overDesc = q('#overDesc');
-  const hint = q('#hint'), winnerForm = q('#winnerForm'), boardTbody = q('#board tbody'), leaderboardBlock = q('#leaderboardBlock');
-  const btnStart = q('#btnStart'), btnReset = q('#btnReset'), btnPlayAgain = q('#btnPlayAgain'), skipSubmit = q('#skipSubmit');
+  const grid = q('#grid'), btnStart = q('#btnStart'), btnReset = q('#btnReset'), btnFast=q('#btnFast');
+  const movesEl = q('#moves'), levelEl = q('#level');
+  const overlayWin = q('#overlayWin'), winTitle=q('#winTitle'), winDesc=q('#winDesc'), btnNext=q('#btnNext'), btnFinishNow=q('#btnFinishNow');
+  const overlaySubmit=q('#overlaySubmit'), winnerForm=q('#winnerForm'), boardTbody=q('#board tbody'), skipSubmit=q('#skipSubmit'), closeSubmit=q('#closeSubmit');
   const toastRoot = q('#toast');
+  const vBadge=q('#vBadge'), vCode=q('#vCode'), levelVoucher=q('#levelVoucher');
+  const allVouchers=q('#allVouchers'), copyAll=q('#copyAll'), btnCloseVouchers=q('#btnCloseVouchers');
+  const globalTimeEl=q('#globalTime'), timerFill=q('#timerFill');
 
-  const MAX_COUPONS = 12;
-  const ICON_PERCENT = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7.5 8.5A2.5 2.5 0 1 1 12.5 8.5 2.5 2.5 0 0 1 7.5 8.5zm4 7a2.5 2.5 0 1 0 2.5-2.5A2.5 2.5 0 0 0 11.5 15.5zM6 18l12-12"/></svg>';
+  const LS_KEY='memory-jumia.board.v3';
+
+  // Very small, fast levels (finishable under 2 min)
+  const LEVELS = [
+    {cols:2, rows:2}, // 4 cards / 2 pairs
+    {cols:2, rows:3}, // 6 / 3
+    {cols:2, rows:4}, // 8 / 4
+    {cols:3, rows:4}, // 12 / 6
+    {cols:3, rows:4}  // 12 / 6
+  ];
+
+  const ICONS = [
+    '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7.5 8.5A2.5 2.5 0 1 1 12.5 8.5 2.5 2.5 0 0 1 7.5 8.5zm4 7a2.5 2.5 0 1 0 2.5-2.5A2.5 2.5 0 0 0 11.5 15.5zM6 18l12-12"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 7h-2.18A3 3 0 0 0 12 6.17 3 3 0 0 0 6.18 7H4v4h16V7zM4 13h7v7H4zm9 7v-7h7v7zM8 5a2 2 0 1 1 4 0c0 1.1-.9 2-2 2s-2-.9-2-2z"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.59 13.41 12 22l-8-8 8-8 8.59 8.41zM7 9a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 3 14h7v8l11-14h-8z"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 17.27 6.18 3.73-1.64-7.03L21 9.24l-7.19-.62L12 2 10.19 8.62 3 9.24l4.46 4.73-1.64 7.03z"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 18c0 1.1.9 2 2 2h6a2 2 0 0 0 2-2v-7H7v7zM8 6h8l1 3H7l1-3z"/></svg>'
+  ];
 
   const state = {
-    playing:false, score:0, missed:0, level:1, timeLeft:30,
-    speedBase:170, spawnEvery:800, lastSpawn:0, lastTick:0,
-    coupons:[], pool:[], combo:0, lastCatchAt:0,
-    fever:0 // seconds remaining
+    level:1, moves:0,
+    lock:false, first:null, second:null, matched:0, totalPairs:0,
+    tiles:[],
+    vouchers:[], // {level, code}
+    globalLimit:120000, // 2 minutes total
+    globalStart:0, globalElapsed:0, ticking:false
   };
 
-  function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
+  function fmt(ms){ const s=Math.max(0,Math.ceil(ms/1000)); const m=Math.floor(s/60), ss=String(s%60).padStart(2,'0'); return `${String(m).padStart(2,'0')}:${ss}`; }
 
-  // Pool coupons
-  function makeCoupon(){
-    const el = document.createElement('div');
-    el.className = 'coupon v-orange'; el.innerHTML = ICON_PERCENT;
-    el.style.transform='translateY(0px)';
-    el._active = false; return el;
+  let rafTimer=null;
+  function startGlobalTimer(){
+    if(state.ticking) return;
+    state.globalStart = performance.now() - state.globalElapsed;
+    state.ticking = true;
+    function t(now){
+      state.globalElapsed = now - state.globalStart;
+      const left = Math.max(0, state.globalLimit - state.globalElapsed);
+      globalTimeEl.textContent = fmt(left);
+      timerFill.style.transform = `scaleX(${left/state.globalLimit})`;
+      if(left<=0){ finishNow(); return; }
+      rafTimer = requestAnimationFrame(t);
+    }
+    rafTimer = requestAnimationFrame(t);
   }
-  for(let i=0;i<MAX_COUPONS;i++){ const n=makeCoupon(); game.appendChild(n); n.style.display='none'; state.pool.push(n); }
+  function stopGlobalTimer(){ if(rafTimer){ cancelAnimationFrame(rafTimer); rafTimer=null; } state.ticking=false; }
 
-  const variants = ['v-orange','v-warm','v-salmon','v-orange','v-orange','v-blue']; // bias towards brand orange
-  function spawnCoupon(){
-    const el = state.pool.find(p=>!p._active);
-    if(!el) return;
-    const gw = game.clientWidth;
-    const x = Math.random()*(gw-70)+8;
-    el.style.left = x + 'px';
-    el.style.top = '-60px';
-    el.style.display = 'grid';
-    el._x = x; el._y = -60; el._active = true;
-    el._speed = (state.speedBase + Math.random()*60 + state.level*18) * (state.fever?1.25:1);
-    // variant
-    el.className = 'coupon ' + variants[(Math.random()*variants.length)|0] + (state.fever ? ' fever':'');
-    state.coupons.push(el);
-  }
-  function deactivate(el){ el._active=false; el.style.display='none'; }
+  // Build deck fast + short preview to make it easy
+  function setup(){
+    const L = LEVELS[state.level-1];
+    const total = L.cols * L.rows;
+    const pairs = Math.floor(total/2);
+    state.totalPairs = pairs;
+    state.moves=0; movesEl.textContent='0';
+    state.lock=false; state.first=null; state.second=null; state.matched=0; state.tiles=[];
+    grid.innerHTML='';
+    grid.className='grid cols-'+L.cols;
 
-  // Controls (touch-first)
-  let pointerActive=false;
-  function setCartX(clientX){
-    const rect = game.getBoundingClientRect();
-    const x = clamp(clientX - rect.left, 0, rect.width);
-    cart.style.left = (x/rect.width*100) + '%';
-  }
-  game.addEventListener('pointerdown', (e)=>{
-    pointerActive=true; setCartX(e.clientX); game.setPointerCapture(e.pointerId);
-    if(!state.playing) start();
-  }, {passive:true});
-  game.addEventListener('pointermove', (e)=>{ if(pointerActive) setCartX(e.clientX); }, {passive:true});
-  game.addEventListener('pointerup', ()=>{ pointerActive=false; }, {passive:true});
+    const set=[];
+    for(let i=0;i<pairs;i++){ const icon = ICONS[i % ICONS.length]; set.push(icon, icon); }
+    for(let i=set.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [set[i], set[j]]=[set[j], set[i]]; }
 
-  // Toasts
-  let toastTimer = null;
-  function showToast(txt){
-    let t = toastRoot.firstElementChild;
-    if(!t){ t = document.createElement('div'); t.className='toast'; toastRoot.appendChild(t); }
-    t.textContent = txt;
-    t.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(()=> t.classList.remove('show'), 640);
+    set.forEach((html)=>{
+      const cell = document.createElement('div'); cell.className='cell';
+      const tile = document.createElement('button'); tile.className='tile'; tile.setAttribute('aria-label','Carte'); tile.type='button';
+      tile.innerHTML = `<div class="face back">${html}</div><div class="face front"><div class="logo">${ICONS[0]}</div></div>`;
+      cell.appendChild(tile); grid.appendChild(cell);
+      tile._icon = html; tile._matched=false;
+      tile.addEventListener('click', ()=> onFlip(tile), {passive:true});
+      state.tiles.push(tile);
+    });
+
+    // Quick auto-reveal to make matching trivial
+    requestAnimationFrame(()=>{
+      state.tiles.forEach(el=> el.classList.add('flipped'));
+      setTimeout(()=> state.tiles.forEach(el=> el.classList.remove('flipped')), 800);
+    });
   }
 
-  function reset(){
-    state.playing=false;
-    state.score=0; state.missed=0; state.level=1; state.timeLeft=30; state.combo=0; state.fever=0;
-    state.speedBase=170; state.spawnEvery=800; state.lastSpawn=0;
-    scoreEl.textContent='0'; missedEl.textContent='0'; levelEl.textContent='1'; timeEl.textContent='30';
-    progressEl.style.width='0%'; overlay.style.display='none'; hint.classList.remove('hidden');
-    comboPill.style.display='none'; comboEl.textContent='1'; feverPill.classList.add('hidden'); streakBar.style.width='0%';
-    game.classList.remove('fever-bg');
-    state.coupons.forEach(deactivate); state.coupons.length=0;
-  }
-
-  function start(){
-    reset(); state.playing=true; state.lastTick=performance.now(); requestAnimationFrame(tick);
-  }
-
-  function updateLevel(){
-    const newLevel = 1 + Math.floor(state.score/10);
-    if(newLevel !== state.level){
-      state.level = newLevel; levelEl.textContent=String(newLevel);
-      state.speedBase += 16; state.spawnEvery = Math.max(320, state.spawnEvery - 45);
-      showToast('🚀 Niveau ' + newLevel);
+  function onFlip(tile){
+    if(!state.ticking) startGlobalTimer();
+    if(state.lock || tile._matched || tile.classList.contains('flipped')) return;
+    tile.classList.add('flipped');
+    if(!state.first){ state.first = tile; return; }
+    state.second = tile; state.lock=true;
+    state.moves += 1; movesEl.textContent = String(state.moves);
+    if(state.first._icon === state.second._icon){
+      state.first._matched = state.second._matched = true;
+      state.first.classList.add('match'); state.second.classList.add('match');
+      state.first = state.second = null; state.lock=false;
+      state.matched += 1;
+      if(navigator.vibrate) navigator.vibrate(10);
+      if(state.matched >= state.totalPairs){ levelWin(); }
+    } else {
+      setTimeout(()=>{
+        state.first.classList.remove('flipped');
+        state.second.classList.remove('flipped');
+        state.first = state.second = null; state.lock=false;
+      }, 280); // fast flip back to keep flow
     }
   }
 
-  function triggerFever(){
-    state.fever = 8; // seconds
-    game.classList.add('fever-bg');
-    feverPill.classList.remove('hidden');
-    showToast('🔥 FEVER ON!');
-    if(navigator.vibrate) navigator.vibrate([20,50,20]);
+  // Vouchers
+  function randCode(level){
+    const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let s=''; for(let i=0;i<4;i++){ s += chars[Math.floor(Math.random()*chars.length)]; }
+    return `JUM-MEM-L${level}-${s}`;
   }
-  function endFever(){
-    state.fever = 0;
-    game.classList.remove('fever-bg');
-    feverPill.classList.add('hidden');
+  function ensureVoucher(level){
+    let v = state.vouchers.find(x=>x.level===level);
+    if(!v){ v = { level, code: randCode(level) }; state.vouchers.push(v); }
+    return v;
   }
-
-  function onCatch(){
-    const now = performance.now();
-    if(now - state.lastCatchAt < 850){ state.combo = Math.min(10, state.combo + 1); }
-    else { state.combo = 1; }
-    state.lastCatchAt = now;
-    comboPill.style.display = state.combo>1 ? '' : 'none';
-    comboEl.textContent = String(state.combo);
-    const mult = state.fever ? 2 : 1;
-    state.score += mult * state.combo; scoreEl.textContent = String(state.score);
-    showToast(state.fever ? ('⚡ +' + (mult*state.combo)) : (state.combo>1 ? ('🔥 Combo x' + state.combo) : 'Super !'));
-    if(navigator.vibrate) navigator.vibrate(16);
-
-    // progress to fever
-    const needed = 6;
-    const p = Math.min(100, (state.combo/needed)*100);
-    streakBar.style.width = p + '%';
-    if(state.combo>=needed && !state.fever) triggerFever();
-  }
-
-  function gameOver(win=false){
-    state.playing=false;
-    overlay.style.display='flex';
-    overTitle.textContent = win ? '🎉 Bravo !' : 'Fin de la partie';
-    overDesc.textContent = `Score ${state.score} • Niveau ${state.level}`;
-    winnerForm.classList.remove('hidden'); leaderboardBlock.classList.add('hidden');
-    endFever();
-    window.dispatchEvent(new CustomEvent('deal-game:finished', {
-      detail: {score:state.score, level:state.level, missed:state.missed, ts:Date.now()}
-    }));
-  }
-
-  function tick(now){
-    if(!state.playing) return;
-    const dt = (now - state.lastTick)/1000; state.lastTick = now;
-
-    // Fever countdown
-    if(state.fever>0){
-      state.fever -= dt;
-      if(state.fever<=0) endFever();
+  async function copyText(txt){
+    try{ await navigator.clipboard.writeText(txt); toast('📋 Copié'); }
+    catch(e){
+      const ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta); ta.select();
+      try{ document.execCommand('copy'); toast('📋 Copié'); }catch{} document.body.removeChild(ta);
     }
-
-    // spawn
-    if(!state.lastSpawn || now - state.lastSpawn > (state.fever? state.spawnEvery*0.7 : state.spawnEvery)){
-      if(state.coupons.length < MAX_COUPONS) spawnCoupon();
-      state.lastSpawn = now;
-    }
-
-    const rectCatch = catchZone.getBoundingClientRect();
-    const rectGame = game.getBoundingClientRect();
-    // during FEVER, agrandir la zone de catch légèrement
-    if(state.fever){ catchZone.style.height = '24px'; } else { catchZone.style.height = '16px'; }
-
-    // move + collisions
-    for(let i=state.coupons.length-1;i>=0;i--){
-      const el = state.coupons[i];
-      el._y += el._speed * dt;
-      el.style.transform = `translateY(${el._y}px)`;
-      const r = el.getBoundingClientRect();
-
-      if(!(r.bottom < rectCatch.top || r.top > rectCatch.bottom || r.right < rectCatch.left || r.left > rectCatch.right)){
-        onCatch(); deactivate(el); state.coupons.splice(i,1); updateLevel(); continue;
-      }
-
-      if(r.top > rectGame.bottom){
-        state.missed += 1; missedEl.textContent = String(state.missed);
-        deactivate(el); state.coupons.splice(i,1);
-        comboPill.style.display='none'; state.combo = 0; streakBar.style.width='0%';
-        if(navigator.vibrate) navigator.vibrate([10,40]);
-        if(state.missed >= 3){ gameOver(false); return; }
-      }
-    }
-
-    // timer
-    state.timeLeft -= dt; const total = 30;
-    timeEl.textContent = String(Math.max(0, Math.ceil(state.timeLeft)));
-    progressEl.style.width = (100*(1 - (total - state.timeLeft)/total)) + '%';
-    if(state.timeLeft <= 0){ gameOver(true); return; }
-
-    hint.classList.add('hidden');
-    requestAnimationFrame(tick);
   }
 
-  // Leaderboard local
-  const LS_KEY = 'deal-game.leaderboard.v3';
-  function getLeaderboard(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)) || []; }catch(e){ return []; } }
-  function setLeaderboard(list){ localStorage.setItem(LS_KEY, JSON.stringify(list.slice(0,100))); }
-  function addToLeaderboard(entry){
-    const list = getLeaderboard();
-    list.push(entry);
-    list.sort((a,b)=> b.score - a.score || a.ts - b.ts);
-    setLeaderboard(list);
+  function levelWin(){
+    const left = Math.max(0, state.globalLimit - state.globalElapsed);
+    q('#overlayWin').style.display='flex';
+    winTitle.textContent = '🎉 Niveau ' + state.level + ' terminé';
+    winDesc.textContent = `Il reste ${fmt(left)} — passe au suivant pour débloquer tous tes bons.`;
+    const v = ensureVoucher(state.level);
+    q('#vBadge').textContent = 'Niv. ' + v.level;
+    q('#vCode').textContent = v.code;
+    q('#levelVoucher').onclick = ()=> copyText(v.code);
   }
-  function renderLeaderboard(){
-    const list = getLeaderboard();
-    boardTbody.innerHTML = '';
-    list.slice(0,25).forEach((row,i)=>{
+
+  function next(){
+    q('#overlayWin').style.display='none';
+    if(state.level >= 5){ finishNow(); return; }
+    state.level += 1; levelEl.textContent = state.level;
+    setup();
+  }
+
+  function finishNow(){
+    // generate any remaining vouchers so user always gets all
+    for(let l=1;l<=5;l++){ ensureVoucher(l); }
+    showAllVouchers();
+    q('#overlayWin').style.display='none';
+    overlaySubmit.style.display='flex';
+    stopGlobalTimer();
+    renderBoard();
+  }
+
+  function showAllVouchers(){
+    allVouchers.innerHTML='';
+    state.vouchers.sort((a,b)=>a.level-b.level).forEach(v=>{
+      const row = document.createElement('div');
+      row.className='coupon'; row.setAttribute('role','button'); row.setAttribute('aria-label','Copier '+v.code);
+      row.innerHTML = `<span class="badge">Niv. ${v.level}</span><span class="code">${v.code}</span><span class="tap">• Taper pour copier</span>`;
+      row.addEventListener('click', ()=> copyText(v.code), {passive:true});
+      allVouchers.appendChild(row);
+    });
+    copyAll.onclick = ()=> copyText(state.vouchers.map(v=>v.code).join(' '));
+  }
+
+  // Leaderboard (optional/local)
+  function getBoard(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)) || []; }catch(e){ return []; } }
+  function setBoard(rows){ localStorage.setItem(LS_KEY, JSON.stringify(rows.slice(0,100))); }
+  function addBoard(entry){
+    const rows = getBoard(); rows.push(entry);
+    rows.sort((a,b)=> (b.level - a.level) || (a.moves - b.moves));
+    setBoard(rows);
+  }
+  function renderBoard(){
+    const rows = getBoard(); boardTbody.innerHTML='';
+    rows.slice(0,25).forEach((r,i)=>{
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${i+1}</td><td>${escapeHTML(row.name)}</td><td>${row.score}</td><td>${row.level}</td><td>${new Date(row.ts).toLocaleDateString()}</td>`;
+      tr.innerHTML = `<td>${i+1}</td><td>${escapeHTML(r.name)}</td><td>${r.level}</td><td>${r.moves}</td><td>${fmt(r.timeMs)}</td><td>${new Date(r.ts).toLocaleDateString()}</td>`;
       boardTbody.appendChild(tr);
     });
   }
@@ -389,27 +378,39 @@
     const email = q('#email').value.trim();
     const phone = q('#phone').value.trim();
     if(!name || !email || !phone) return;
-    const entry = { name, email, phone, score:state.score, level:state.level, ts:Date.now() };
-    addToLeaderboard(entry); renderLeaderboard();
-    winnerForm.classList.add('hidden'); leaderboardBlock.classList.remove('hidden');
-    window.dispatchEvent(new CustomEvent('deal-game:submit', { detail: entry }));
-    // fetch('VOTRE_APPS_SCRIPT_URL', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(entry)});
+    const entry = { name, email, phone, level: state.level, moves: state.moves, timeMs: state.globalElapsed, ts: Date.now() };
+    addBoard(entry); renderBoard();
+    window.dispatchEvent(new CustomEvent('memory:submit', { detail: { ...entry, vouchers: state.vouchers } }));
   });
 
-  skipSubmit.addEventListener('click', ()=>{
-    renderLeaderboard(); winnerForm.classList.add('hidden'); leaderboardBlock.classList.remove('hidden');
-  });
+  // Controls
+  btnStart.addEventListener('click', ()=>{ state.level=1; levelEl.textContent=1; state.globalElapsed=0; startGlobalTimer(); setup(); });
+  btnReset.addEventListener('click', ()=>{ state.globalElapsed=0; startGlobalTimer(); setup(); });
+  btnFast.addEventListener('click', finishNow);
+  btnFinishNow.addEventListener('click', finishNow);
+  btnNext.addEventListener('click', next);
+  skipSubmit.addEventListener('click', ()=> overlaySubmit.style.display='none');
+  closeSubmit.addEventListener('click', ()=> overlaySubmit.style.display='none');
+  btnCloseVouchers.addEventListener('click', ()=> overlaySubmit.style.display='none');
 
-  btnStart.addEventListener('click', ()=>{ if(!state.playing) start(); });
-  btnReset.addEventListener('click', reset);
-  btnPlayAgain.addEventListener('click', ()=> start());
+  // Toast helper
+  function toast(msg){
+    let t = toastRoot.firstElementChild;
+    if(!t){ t = document.createElement('div'); t.className='toast'; toastRoot.appendChild(t); }
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(()=> t.classList.remove('show'), 900);
+  }
 
-  window.DealsGame = {
-    start, reset,
-    onFinish(h){ window.addEventListener('deal-game:finished', e=>h(e.detail)); },
-    onSubmit(h){ window.addEventListener('deal-game:submit', e=>h(e.detail)); },
-    getLeaderboard
+  // Public API
+  window.MemoryJumia = {
+    start: ()=>{ state.level=1; levelEl.textContent=1; state.globalElapsed=0; startGlobalTimer(); setup(); },
+    onSubmit: (h)=> window.addEventListener('memory:submit', e=>h(e.detail)),
+    getVouchers: ()=> state.vouchers.slice()
   };
+
+  // Auto-setup grid placeholder (not started until tap)
+  setup();
 })();
 </script>
 </body>
